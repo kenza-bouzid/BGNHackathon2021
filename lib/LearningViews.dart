@@ -1,67 +1,62 @@
 import 'package:flutter/material.dart';
+import 'Models.dart';
 
+class LearnView extends StatefulWidget{
+  LearnView({this.chapter,this.returnHome,this.moveToTest});
+  final Chapter chapter;
 
-/*
-void main() {
+  Function returnHome;
+  Function moveToTest;
 
-  var exampleUnit = new ChapterUnit(unit:"A",unitID: "A",image: "asign.png",tips: "1. Make a fist\n2. Release your thumb");
-  var exampleChapter = new Chapter(title: "Alphabet",units:[exampleUnit]);
-
-  runApp(MaterialApp(home: LearnView(chapter: exampleChapter)));
-}
-*/
-
-//A group of units
-class Chapter{
-
-  Chapter({this.title,this.units});
-
-  //The minimum word descriptor of this chapter
-  String title;
-  //A collection of units
-  List<ChapterUnit> units;
-
+  createState() => LearnViewState();
 }
 
-//The learning and testing material for a specific unit in a chapter
-class ChapterUnit{
-
-  ChapterUnit({this.unit,this.unitID,this.image,this.tips});
-  //The specific unit to be learned e.g: a word, a number, an emotion
-  String unit;
-  //The representation of this unit for api use
-  String unitID;
-  //Path to image in assets
-  String image;
-  //Tips,seperated by \n to indicate new lines
-  String tips;
-}
-
-class LearnView extends StatelessWidget{
+class LearnViewState extends State<LearnView>{
   var normal = TextStyle(fontSize: 18,fontWeight: FontWeight.normal);
   var bold =  TextStyle(fontSize: 25,fontWeight: FontWeight.bold);
 
-  LearnView({this.chapter});
-
-  final Chapter chapter;
   int currentUnit = 0;
+  bool completed = false;
 
   Widget inSessionView(){
-    return
-    Column(children: [
-            SizedBox(height: 10),
-            Align(alignment: Alignment.centerLeft,child:Text("Learning: ${chapter.title}",style: bold,)),
-            SizedBox(height: 10),
-            Align(alignment: Alignment.centerLeft,child:Text("Example ${currentUnit+1} of 26",style: normal)),
-            SizedBox(height: 20),
-            LearnUnitView(unit: chapter.units[currentUnit]),
-            SizedBox(height: 40),
-            ConstrainedBox(
+    
+    Widget progressButton = ConstrainedBox(
             constraints: BoxConstraints.tightFor(width: 300, height: 60),
             child: ElevatedButton(
               child: Text('Got It!',style:TextStyle(fontWeight: FontWeight.bold,fontSize: 18)),
-              onPressed: () {},
-            )),
+              onPressed: () {progress();},
+            ));
+
+    Widget previousButton = ConstrainedBox(
+            constraints: BoxConstraints.tightFor(width: 300, height: 60),
+            child: ElevatedButton(
+              child: Text('Previous',style:TextStyle(fontWeight: FontWeight.bold,fontSize: 18)),
+              onPressed: () {previous();},
+            ));
+
+    Widget getButtons(){
+      if(currentUnit == 0){
+        return progressButton;
+      }
+      else{
+        return Column(children: [
+          progressButton,
+          SizedBox(height: 20),
+          previousButton
+        ]);
+      }
+    }
+
+    return
+    Column(children: [
+            SizedBox(height: 10),
+            Align(alignment: Alignment.centerLeft,child:Text("Learning: ${widget.chapter.title}",style: bold,)),
+            SizedBox(height: 10),
+            Align(alignment: Alignment.centerLeft,child:Text("Example ${currentUnit+1} of 26",style: normal)),
+            SizedBox(height: 20),
+            LearnUnitView(unit: widget.chapter.units[currentUnit]),
+            SizedBox(height: 40),
+            getButtons(),
             SizedBox(height: 10)
           ]
     );
@@ -73,7 +68,7 @@ class LearnView extends StatelessWidget{
       SizedBox(height: 30),
       Align(alignment: Alignment.center,child:Text("You learnt all the signs in this chapter!",style:normal)),
       SizedBox(height: 30),
-      Align(alignment: Alignment.center,child:Text("${chapter.title}",style:TextStyle(fontSize: 40,fontWeight: FontWeight.bold))),
+      Align(alignment: Alignment.center,child:Text("${widget.chapter.title}",style:TextStyle(fontSize: 40,fontWeight: FontWeight.bold))),
       SizedBox(height: 10),
       Align(alignment: Alignment.center,child:Text("Completed 🥳",style:normal)),
       SizedBox(height: 50),
@@ -81,7 +76,7 @@ class LearnView extends StatelessWidget{
             constraints: BoxConstraints.tightFor(width: 300, height: 60),
             child: ElevatedButton(
               child: Text('Test Me!',style:TextStyle(fontWeight: FontWeight.bold,fontSize: 18)),
-              onPressed: () {},
+              onPressed: () {widget.moveToTest();},
             )
       ),
       SizedBox(height: 30),
@@ -89,14 +84,14 @@ class LearnView extends StatelessWidget{
             constraints: BoxConstraints.tightFor(width: 300, height: 60),
             child: ElevatedButton(
               child: Text('Done',style:TextStyle(fontWeight: FontWeight.bold,fontSize: 18)),
-              onPressed: () {},
+              onPressed: () {widget.returnHome();},
             )
       )
     ]);
   }
 
   Widget getView(){
-    if(true){
+    if(!completed){
       return inSessionView();
     }
     else{
@@ -104,12 +99,28 @@ class LearnView extends StatelessWidget{
     }
   }
 
+  @override
   Widget build(BuildContext context){
-    return
-    Scaffold(
-      appBar: AppBar(title: Text("OreoSign")),
-      body: Padding(padding:EdgeInsets.all(10),child: getView())
-    );
+    return Padding(padding:EdgeInsets.all(10),child: getView());
+  }
+
+  void progress(){
+    setState(() {
+      if(currentUnit+1 < widget.chapter.units.length){
+        currentUnit+=1;
+      }
+      else if(currentUnit >= widget.chapter.units.length-1){
+        completed = true;
+      }
+    });
+  }
+
+  void previous(){
+    setState(() {
+      if(currentUnit > 0){
+        currentUnit-=1;
+      }
+    });
   }
 }
 
