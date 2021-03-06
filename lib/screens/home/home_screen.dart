@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:oreo_signs/constants.dart';
 import 'package:oreo_signs/screens/home/components/body.dart';
+import 'package:oreo_signs/screens/pages/testing_screen.dart';
+import 'package:oreo_signs/screens/pages/learning_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -34,7 +36,8 @@ class HomeScreen extends StatelessWidget {
                 color: aPrimaryColour,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
-                onPressed: () {},
+                onPressed: () { Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => LearningScreen()));},
                 child: Text('Learn')),
             Spacer(),
             FlatButton(
@@ -47,7 +50,10 @@ class HomeScreen extends StatelessWidget {
                 color: aPrimaryColour,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => TestingScreen()));
+                },
                 child: Text('Test')),
             //IconButton(icon: Icon(Icons.access_alarm), onPressed: () {})
           ],
