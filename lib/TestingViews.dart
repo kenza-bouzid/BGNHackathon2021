@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Models.dart';
 
+
 class TestView extends StatefulWidget{
   final Chapter chapter;
 
@@ -13,10 +14,16 @@ class TestView extends StatefulWidget{
 }
 
 class TestViewState extends State<TestView>{
+  Color green = const Color.fromRGBO(0, 128, 0, 1);
+  Color blue = const Color.fromRGBO(0, 0, 250, 1);
+
   var normal = TextStyle(fontSize: 18,fontWeight: FontWeight.normal);
   var bold =  TextStyle(fontSize: 25,fontWeight: FontWeight.bold);
 
   int currentUnit = 0;
+  int correctAnswers = 2;
+  final double passMark = 0.5;
+
   bool completed =  false;
 
   void progress(){
@@ -41,17 +48,37 @@ class TestViewState extends State<TestView>{
         SizedBox(height: 10),
         Align(alignment: Alignment.centerLeft,child:Text("Question ${currentUnit+1} of 26",style: normal)),
         SizedBox(height: 20),
-        TestUnitView(unit: widget.chapter.units[currentUnit],progress:()=>{progress()})
+        new TestUnitView(unit: widget.chapter.units[currentUnit],progress:()=>{progress()})
       ]);
     }
     else{
       //Completed
+      return
       Column(children: [
-        Text("You completed the test!"),
-        SizedBox(height: 10),
-        Align(alignment: Alignment.centerLeft,child:Text("Done",style: bold,)),
-        SizedBox(height: 10),
-      ]);
+            Align(alignment: Alignment.center,child:Text("you answered ${correctAnswers}/${widget.chapter.units.length} correctly",style:normal)),
+            SizedBox(height: 10),
+            Align(alignment: Alignment.center,child:Text(passMark*widget.chapter.units.length.toDouble() < correctAnswers ? "You Passed" : "Try Again",style:TextStyle(fontSize: 40,fontWeight: FontWeight.bold,color: passMark*widget.chapter.units.length.toDouble() < correctAnswers ? green : blue))),
+            SizedBox(height: 40),
+            SizedBox(height: 50),
+            ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(width: 300, height: 60),
+                  child: ElevatedButton(
+                    child: Text('Do it again',style:TextStyle(fontWeight: FontWeight.bold,fontSize: 18)),
+                    onPressed: () {},
+                  )
+            ),
+            SizedBox(height: 30),
+            ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(width: 300, height: 60),
+                  child: ElevatedButton(
+                    child: Text('Next Question',style:TextStyle(fontWeight: FontWeight.bold,fontSize: 18)),
+                    onPressed: () {
+                      
+                    },
+                  )
+            )
+          ]
+    );
     }
   }
 
@@ -91,7 +118,7 @@ class TestUnitViewState extends State<TestUnitView>{
                   constraints: BoxConstraints.tightFor(width: 300, height: 60),
                   child: ElevatedButton(
                     child: Text('Do it again',style:TextStyle(fontWeight: FontWeight.bold,fontSize: 18)),
-                    onPressed: () {},
+                    onPressed: () {resetAnswer();},
                   )
             ),
             SizedBox(height: 30),
@@ -100,8 +127,10 @@ class TestUnitViewState extends State<TestUnitView>{
                   child: ElevatedButton(
                     child: Text('Next Question',style:TextStyle(fontWeight: FontWeight.bold,fontSize: 18)),
                     onPressed: () {
-                      correct = null;
-                      widget.progress();
+                      resetAnswer();
+                      setState(() {
+                        widget.progress();
+                      });
                     },
                   )
             )
@@ -129,6 +158,12 @@ class TestUnitViewState extends State<TestUnitView>{
   void checkAnswer(){
     setState(() {
       correct = true;
+    });
+  }
+
+  void resetAnswer(){
+    setState(() {
+      correct = null;
     });
   }
 
